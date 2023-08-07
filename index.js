@@ -1,5 +1,5 @@
 import express from 'express'
-
+import cors from 'cors'
 import dotenv from "dotenv"
 import conectarDB from './config/db.js';
 import usuarioRoutes from "./routes/usuarioRoutes.js";
@@ -13,7 +13,23 @@ app.use(express.json());
 dotenv.config()
 conectarDB()
 
+//cors
+const whitelist = ['https://admin.warasdelivery.com', "http://localhost:5173"];
 
+
+
+//Cors con acceso a un dominio
+
+const corsOptions = {
+    origin: function (origin, callback) {
+
+        if (whitelist.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Error de cors de aca"));
+        }
+    },
+};
 
 
 app.use("/api/usuarios", usuarioRoutes);
