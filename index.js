@@ -13,7 +13,7 @@ conectarDB()
 
 //Routing
 app.use("/", (req, res) => {
-    res.send("Hola mundo")
+    res.send("api working")
 })
 
 app.use("/api/usuarios", usuarioRoutes);
