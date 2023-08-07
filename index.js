@@ -31,6 +31,9 @@ const corsOptions = {
     },
 };
 
+app.use(cors())
+
+
 
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/pedidos", pedidoRoutes);
