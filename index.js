@@ -14,7 +14,7 @@ dotenv.config()
 conectarDB()
 
 //cors
-const whitelist = ['https://admin.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000"];
+const whitelist = ['https://admin.warasdelivery.com','https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000"];
 
 
 
@@ -40,7 +40,7 @@ app.use("/api/pedidos", pedidoRoutes);
 app.use("/api/locales", localRoutes);
 app.use("/api/clientes", clienteRoutes);
 
-const PORT = process.env.PORT || 4000
+const PORT = 4000 //process.env.PORT || 4000
 
 app.listen(PORT,()=> {
     console.log(`servidor corriendo en el puerto ${PORT}`);

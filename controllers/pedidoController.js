@@ -41,7 +41,7 @@ const obtenerPedidosNoEntregados = async (req, res) => {
             "-colaboradores -createdAt -direccion -gps -habilitado -telefonoUno -updatedAt -__v"
         )
         .select(
-            "-createdAt -gpsCreacion -horaCreacion -medioDePago -updatedAt -__v"
+            "-createdAt -gpsCreacion -horaCreacion -updatedAt -__v"
         );
     res.json(pedidos);
 };
@@ -100,6 +100,8 @@ const obtenerPedido = async (req, res) => {
             path: "cliente",
             select: "",
         });
+
+    console.log(pedido);
     if (!pedido) {
         return res.status(404).json({ msg: "Pedido no encontrado" });
     }
@@ -108,6 +110,52 @@ const obtenerPedido = async (req, res) => {
     if (
         req.usuario.rol.toString() == "administrador" ||
         req.usuario.rol.toString() == "soporte"
+    ) {
+        return res.json(pedido);
+    }
+
+    //validacion de si el motorizado esta consultando su pedido
+    if (req.usuario._id.toString() === pedido.driver._id.toString()) {
+        return res.json(pedido);
+    }
+};
+
+const obtenerPedidoSocio = async (req, res) => {
+    const { id } = req.params;
+
+    const pedido = await Pedido.findById(id)
+        .populate({
+            path: "driver",
+            populate: {
+                path: "organizacion",
+                select: "-direccion -gps -telefonoUno -colaboradores -habilitado -createdAt -updatedAt -__v",
+            },
+            select: "-password -confirmado -habilitado -token -createdAt -updatedAt -__v",
+        })
+        .populate({
+            path: "generadoPor",
+            select: "-password -confirmado -rol -habilitado -token -createdAt -updatedAt -__v",
+            populate: {
+                path: "organizacion",
+                select: "-direccion -gps -telefonoUno -colaboradores -habilitado -createdAt -updatedAt -__v",
+            },
+        })
+        .populate({
+            path: "local",
+            select: "-createdAt -habilitado -updatedAt",
+        })
+        .populate({
+            path: "cliente",
+            select: "",
+        });
+
+    if (!pedido) {
+        return res.status(404).json({ msg: "Pedido no encontrado" });
+    }
+
+    //validacion de si es administrador o soporte
+    if (
+        req.usuario.rol.toString() == "socio"
     ) {
         return res.json(pedido);
     }
@@ -185,28 +233,28 @@ const eliminarPedido = async (req, res) => {
     }
 };
 
-const asignarMotorizado = async (req, res) => {};
+const asignarMotorizado = async (req, res) => { };
 
 const obtenerPedidosPorFecha = async (req, res) => {
-    const {fecha} = req.body;
-    const pedidos = await Pedido.find({fecha}).populate("driver")
+    const { fecha } = req.body;
+    const pedidos = await Pedido.find({ fecha }).populate("driver")
 
     res.json(pedidos)
-    
+
 };
 
 const obtenerMotorizados = async (req, res) => {
     const motorizados = await Usuario.find({ rol: "motorizado" }).select(
         " -createdAt   -password -rol -token -updatedAt -__v "
-    );
+    ).sort({ nombre: 1 });;
 
-    res.json(motorizados);
+    res.json(motorizados)
 };
 
 const obtenerLocales = async (req, res) => {
     const locales = await Local.find({ habilitado: true }).select(
         " -colaboradores  -createdAt -updatedAt -__v"
-    );
+    ).sort({ nombre: 1 });
 
     res.json(locales);
 };
@@ -220,6 +268,133 @@ const obtenerClientes = async (req, res) => {
     res.json(clientes);
 };
 
+const obtenerPedidosSocio = async (req, res) => {
+    const { organizacion } = req.body;
+    const pedidosSocio = await Pedido.find({ local: organizacion }).populate("driver")
+    res.json(pedidosSocio);
+}
+
+const obtenerPedidosMotorizado = async (req, res) => {
+    const { driver } = req.body;
+    const pedidosMotorizado = await Pedido.find({ driver }).populate("driver").populate("local")
+    res.json(pedidosMotorizado)
+}
+
+const aceptarPedido = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const pedido = await Pedido.findById(id);
+
+        if (!pedido) {
+            const error = new Error("Pedido no encontrado");
+            return res.status(404).json({ msg: error.message });
+        }
+
+        if (!pedido.driver) {
+            pedido.driver = req.body.driver || pedido.driver;
+            pedido.estadoPedido = "pendiente" || pedido.estadoPedido;
+            const pedidoGuardado = await pedido.save();
+            res.json(pedidoGuardado);
+        } else {
+            const error = new Error("Pedido ya ha sido tomado");
+            return res.status(400).json({ msg: error.message });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
+const liberarPedido = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const pedido = await Pedido.findById(id);
+
+        if (!pedido) {
+            const error = new Error("Pedido no encontrado");
+            return res.status(404).json({ msg: error.message });
+        }
+
+        if (pedido.driver) {
+            pedido.driver = undefined;
+            pedido.estadoPedido = "sin asignar" // Eliminar el valor del campo driver
+            const pedidoGuardado = await pedido.save();
+            res.json(pedidoGuardado);
+        } else {
+            const error = new Error("El pedido no tiene asignado un conductor");
+            return res.status(400).json({ msg: error.message });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
+const marcarPedidoEnLocal = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const pedido = await Pedido.findById(id);
+
+        if (!pedido) {
+            const error = new Error("Pedido no encontrado");
+            return res.status(404).json({ msg: error.message });
+        }
+
+        pedido.estadoPedido = "en local"; // Cambiar el estado del pedido
+        const pedidoGuardado = await pedido.save();
+        res.json(pedidoGuardado);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+const marcarPedidoRecogido = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const pedido = await Pedido.findById(id);
+
+        if (!pedido) {
+            const error = new Error("Pedido no encontrado");
+            return res.status(404).json({ msg: error.message });
+        }
+
+        pedido.estadoPedido = "recogido"; // Cambiar el estado del pedido
+        const pedidoGuardado = await pedido.save();
+        res.json(pedidoGuardado);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
+const marcarPedidoEntregado = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const pedido = await Pedido.findById(id);
+
+        if (!pedido) {
+            const error = new Error("Pedido no encontrado");
+            return res.status(404).json({ msg: error.message });
+        }
+
+        pedido.estadoPedido = "entregado"; // Cambiar el estado del pedido
+        const pedidoGuardado = await pedido.save();
+        res.json(pedidoGuardado);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
+
+
+
+
 export {
     nuevoPedido,
     obtenerPedido,
@@ -229,8 +404,16 @@ export {
     obtenerPedidosMotorizadoLogueado,
     obtenerPedidosNoEntregados,
     obtenerUltimosVeintePedidos,
+    obtenerPedidosSocio,
+    obtenerPedidosMotorizado,
+    obtenerPedidoSocio,
     obtenerPedidosPorFecha,
     obtenerMotorizados,
     obtenerLocales,
     obtenerClientes,
+    aceptarPedido,
+    liberarPedido,
+    marcarPedidoEnLocal,
+    marcarPedidoRecogido,
+    marcarPedidoEntregado
 };

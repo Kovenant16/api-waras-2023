@@ -8,6 +8,7 @@ import {
     registrarUsuarioSocio,
     registrarUsuarioMoto,
     autenticarUsuarioMotorizado,
+    autenticarUsuarioSocio,
     confirmarUsuario,
     olvidePassword,
     comprobarToken,
@@ -25,6 +26,7 @@ router.post("/registrarSocio", registrarUsuarioSocio);
 router.post("/registrarMoto", registrarUsuarioMoto);
 router.post("/loginMoto", autenticarUsuarioMotorizado)
 router.post("/login", autenticarUsuarioAdmin);
+router.post("/loginSocio",  autenticarUsuarioSocio)
 router.get("/confirmar/:token", confirmarUsuario);
 router.post("/olvide-password", olvidePassword);
 router.get("/olvide-password/:token", comprobarToken);
