@@ -11,6 +11,7 @@ import {
     autenticarUsuarioSocio,
     confirmarUsuario,
     olvidePassword,
+    olvidePasswordMoto,
     comprobarToken,
     nuevoPassword,
     perfil,
@@ -29,6 +30,7 @@ router.post("/login", autenticarUsuarioAdmin);
 router.post("/loginSocio",  autenticarUsuarioSocio)
 router.get("/confirmar/:token", confirmarUsuario);
 router.post("/olvide-password", olvidePassword);
+router.post("/olvide-password-moto", olvidePasswordMoto);
 router.get("/olvide-password/:token", comprobarToken);
 router.post("/olvide-password/:token", nuevoPassword);
 

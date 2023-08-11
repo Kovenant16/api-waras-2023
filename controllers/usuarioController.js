@@ -1,7 +1,7 @@
 import Usuario from "../models/Usuario.js";
 import generarId from "../helpers/generarId.js";
 import generarJWT from "../helpers/generarJWT.js";
-import { emailRegistro, emailOlvidePassword } from "../helpers/email.js";
+import { emailRegistro, emailOlvidePassword, emailRegistroMoto, emailOlvidePasswordMoto } from "../helpers/email.js";
 
 const registrarUsuario = async (req, res) => {
     //evitar registros duplicados
@@ -140,7 +140,7 @@ const registrarUsuarioMoto = async (req, res) => {
             telefono:usuario.telefono
         })
         */
-        emailRegistro({
+        emailRegistroMoto({
             email: usuario.email,
             nombre: usuario.nombre,
             token: usuario.token,
@@ -322,6 +322,31 @@ const olvidePassword = async (req, res) => {
         console.log(error);
     }
 };
+const olvidePasswordMoto = async (req, res) => {
+    const { email } = req.body;
+
+    //comprobar si el usuario existe
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+        const error = new Error("El usuario no existe");
+        return res.status(404).json({ msg: error.message });
+    }
+
+    try {
+        usuario.token = generarId();
+        await usuario.save();
+        //enviar el email
+        emailOlvidePasswordMoto({
+            email: usuario.email,
+            nombre: usuario.nombre,
+            token: usuario.token,
+            telefono: usuario.telefono,
+        })
+        res.json({ msg: "Te hemos enviado un email con las instrucciones, revisa tu correo" });
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 const comprobarToken = async (req, res) => {
     const { token } = req.params;
@@ -386,6 +411,7 @@ export {
     autenticarUsuarioSocio,
     confirmarUsuario,
     olvidePassword,
+    olvidePasswordMoto,
     comprobarToken,
     nuevoPassword,
     perfil,
