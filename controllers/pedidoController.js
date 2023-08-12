@@ -38,7 +38,7 @@ const obtenerPedidosNoEntregados = async (req, res) => {
         )
         .populate(
             "local",
-            "-colaboradores -createdAt -direccion -gps -habilitado -telefonoUno -updatedAt -__v"
+            "-colaboradores -createdAt -direccion -habilitado -telefonoUno -updatedAt -__v"
         )
         .select(
             "-createdAt -gpsCreacion -horaCreacion -updatedAt -__v"
