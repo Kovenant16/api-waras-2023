@@ -42,6 +42,31 @@ app.use("/api/clientes", clienteRoutes);
 
 const PORT = 4000 //process.env.PORT || 4000
 
-app.listen(PORT,()=> {
+const servidor = app.listen(PORT,()=> {
     console.log(`servidor corriendo en el puerto ${PORT}`);
+})
+
+//Sockets.io
+import {Server} from 'socket.io'
+
+const io = new Server(servidor, {
+    pingTimeout:60000,
+    cors:{
+        origin: ['https://admin.warasdelivery.com','https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000"]
+    },
+});
+
+io.on('connection', (socket)=> {
+    console.log('conectado a socKet.io');
+
+    //eventos
+    socket.on('ver pedidos', (pedidos)=> {
+        socket.join(pedidos)
+        socket.emit('respuesta', pedidos)
+    })
+
+    socket.on('crear pedido', pedido => {
+        console.log(pedido);
+        socket.emit('respuesta', pedido)
+    })
 })

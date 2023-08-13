@@ -237,7 +237,7 @@ const asignarMotorizado = async (req, res) => { };
 
 const obtenerPedidosPorFecha = async (req, res) => {
     const { fecha } = req.body;
-    const pedidos = await Pedido.find({ fecha }).populate("driver")
+    const pedidos = await Pedido.find({ fecha }).populate("driver").populate("local")
 
     res.json(pedidos)
 
