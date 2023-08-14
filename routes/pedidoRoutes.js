@@ -20,7 +20,8 @@ import {
     liberarPedido,
     marcarPedidoEnLocal,
     marcarPedidoRecogido,
-    marcarPedidoEntregado
+    marcarPedidoEntregado,
+    obtenerPedidosPorFechasYLocal
 } from "../controllers/pedidoController.js";
 import checkAuth from "../middleware/checkAuth.js";
 
@@ -33,7 +34,8 @@ router.get('/clientes/:telefono', obtenerClientes)
 router.get("/ultimosVeintePedidos", checkAuth, obtenerUltimosVeintePedidos);
 router.get("/pedidosNoEntregados", checkAuth, obtenerPedidosNoEntregados);
 router.get("/pedidosMotorizado", checkAuth, obtenerPedidosMotorizadoLogueado);
-router.post('/obtenerPedidosPorFecha', obtenerPedidosPorFecha)
+router.post('/obtenerPedidosPorFecha',checkAuth, obtenerPedidosPorFecha)
+router.post('/obtenerPedidosPorFechasYLocal',checkAuth, obtenerPedidosPorFechasYLocal)
 router.post('/pedidosSocio',checkAuth, obtenerPedidosSocio)
 router.post('/pedidosMotorizado',  obtenerPedidosMotorizado)
 router.get('/pedidoSocio/:id',checkAuth, obtenerPedidoSocio)

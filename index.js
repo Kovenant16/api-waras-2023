@@ -62,7 +62,7 @@ io.on('connection', (socket)=> {
     //eventos
     socket.on('ver pedidos', (pedidos)=> {
         socket.join(pedidos)
-        socket.emit('respuesta', pedidos)
+        socket.emit('respuesta', {nombre:"Reimer"})
     })
 
     socket.on('crear pedido', pedido => {

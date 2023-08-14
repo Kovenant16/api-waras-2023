@@ -243,6 +243,31 @@ const obtenerPedidosPorFecha = async (req, res) => {
 
 };
 
+const obtenerPedidosPorFechasYLocal = async (req, res) => {
+    const { fechas, localIds } = req.body;
+
+
+    if (!Array.isArray(fechas) || fechas.length === 0) {
+        return res.status(400).json({ message: "El arreglo de fechas es inválido o está vacío." });
+    }
+
+    let query = { fecha: { $in: fechas } };
+
+    if (Array.isArray(localIds) && localIds.length > 0) {
+        query.local = { $in: localIds };
+    }
+
+    const pedidos = await Pedido.find(query).populate("driver").populate("local");
+
+    
+
+    res.json(pedidos);
+};
+
+
+
+
+
 const obtenerMotorizados = async (req, res) => {
     const motorizados = await Usuario.find({ rol: "motorizado" }).select(
         " -createdAt   -password -rol -token -updatedAt -__v "
@@ -260,8 +285,8 @@ const obtenerLocales = async (req, res) => {
 };
 
 const obtenerClientes = async (req, res) => {
-    const { telefono } = req.body.telefono;
-    const clientes = await Cliente.find({});
+    const { telefono } = req.body; // Corregir aquí
+    const clientes = await Cliente.find({ telefono });
 
     console.log(telefono);
 
@@ -415,5 +440,6 @@ export {
     liberarPedido,
     marcarPedidoEnLocal,
     marcarPedidoRecogido,
-    marcarPedidoEntregado
+    marcarPedidoEntregado,
+    obtenerPedidosPorFechasYLocal
 };
