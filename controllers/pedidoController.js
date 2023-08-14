@@ -42,7 +42,10 @@ const obtenerPedidosNoEntregados = async (req, res) => {
         )
         .select(
             "-createdAt -gpsCreacion -horaCreacion -updatedAt -__v"
-        );
+        )
+        .sort({
+            hora: 1  // Orden ascendente por el campo 'hora'
+        });
     res.json(pedidos);
 };
 
