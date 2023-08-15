@@ -36,7 +36,6 @@ const pedidosSchema = mongoose.Schema(
         },
         telefono: {
             type: String,
-            required: true,
         },
         cobrar: {
             type: String,
