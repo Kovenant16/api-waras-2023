@@ -20,17 +20,11 @@ const agregarCliente = async (req, res) => {
 const buscarClientesPorTelefono = async (req, res) => {
     const { telefono } = req.body;
 
-    try {
-        const clientes = await Cliente.find({ telefono });
-        if (clientes.length > 0) {
-            return console.log(clientes);
-        } else {
-            return res.status(404).json({ msg: "Clientes no encontrados" });
-        }
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ msg: "Error en el servidor" });
-    }
+    const clientes = await Cliente.find({telefono})
+
+    res.json(clientes)
+
+    
 };
 
 
