@@ -260,9 +260,9 @@ const obtenerPedidosPorFechasYLocal = async (req, res) => {
         query.local = { $in: localIds };
     }
 
-    const pedidos = await Pedido.find(query).populate("driver").populate("local");
+    const pedidos = await Pedido.find(query).populate("driver", "-activo -confirmado -createdAt -email -habilitado -password - rol -telefono -token -updatedAt -__v").populate("local", "-colaboradores -createdAt -direccion -gps -habilitado -telefonoUno -updatedAt -__v");
 
-    
+
 
     res.json(pedidos);
 };

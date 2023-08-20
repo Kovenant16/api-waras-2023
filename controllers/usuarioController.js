@@ -1,7 +1,7 @@
 import Usuario from "../models/Usuario.js";
 import generarId from "../helpers/generarId.js";
 import generarJWT from "../helpers/generarJWT.js";
-import { emailRegistro, emailOlvidePassword, emailRegistroMoto, emailOlvidePasswordMoto } from "../helpers/email.js";
+import { emailRegistro, emailOlvidePassword, emailRegistroMoto, emailOlvidePasswordMoto, emailRegistroSocio, emailOlvidePasswordSocio } from "../helpers/email.js";
 
 const registrarUsuario = async (req, res) => {
     //evitar registros duplicados
@@ -102,7 +102,7 @@ const registrarUsuarioSocio = async (req, res) => {
             telefono:usuario.telefono
         })
         */
-        emailRegistro({
+        emailRegistroSocio({
             email: usuario.email,
             nombre: usuario.nombre,
             token: usuario.token,
@@ -189,6 +189,7 @@ const autenticarUsuarioAdmin = async (req, res) => {
             nombre: usuario.nombre,
             email: usuario.email,
             token: generarJWT(usuario._id),
+            rol:usuario.rol
         });
     } else {
         const error = new Error("El password es incorrecto");
@@ -231,6 +232,7 @@ const autenticarUsuarioMotorizado = async (req, res) => {
             nombre: usuario.nombre,
             email: usuario.email,
             token: generarJWT(usuario._id),
+            rol:usuario.rol
         });
     } else {
         const error = new Error("El password es incorrecto");
@@ -273,6 +275,7 @@ const autenticarUsuarioSocio = async (req, res) => {
             nombre: usuario.nombre,
             email: usuario.email,
             token: generarJWT(usuario._id),
+            rol:usuario.rol
         });
     } else {
         const error = new Error("El password es incorrecto");
@@ -348,6 +351,32 @@ const olvidePasswordMoto = async (req, res) => {
     }
 };
 
+const olvidePasswordSocio = async (req, res) => {
+    const { email } = req.body;
+
+    //comprobar si el usuario existe
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+        const error = new Error("El usuario no existe");
+        return res.status(404).json({ msg: error.message });
+    }
+
+    try {
+        usuario.token = generarId();
+        await usuario.save();
+        //enviar el email
+        emailOlvidePasswordSocio({
+            email: usuario.email,
+            nombre: usuario.nombre,
+            token: usuario.token,
+            telefono: usuario.telefono,
+        })
+        res.json({ msg: "Te hemos enviado un email con las instrucciones, revisa tu correo" });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 const comprobarToken = async (req, res) => {
     const { token } = req.params;
     const tokenValido = await Usuario.findOne({ token });
@@ -412,6 +441,7 @@ export {
     confirmarUsuario,
     olvidePassword,
     olvidePasswordMoto,
+    olvidePasswordSocio,
     comprobarToken,
     nuevoPassword,
     perfil,
