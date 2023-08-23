@@ -240,10 +240,22 @@ const asignarMotorizado = async (req, res) => { };
 
 const obtenerPedidosPorFecha = async (req, res) => {
     const { fecha } = req.body;
-    const pedidos = await Pedido.find({ fecha }).populate("driver").populate("local").populate("generadoPor")
+    const pedidos = await Pedido.find({ fecha })
+        .populate({
+            path: "driver",
+            select: "nombre" // Solo seleccionamos el campo 'nombre' del driver
+        })
+        .populate({
+            path:"local",
+            select: "nombre"
+        })
+        .populate({
+            path:"generadoPor",
+            select:"nombre"
+        })
+        .select("-detallePedido -gps -gpsCreacion -horaCreacion -medioDePago -tipoPedido");
 
-    res.json(pedidos)
-
+    res.json(pedidos);
 };
 
 const obtenerPedidosPorFechasYLocal = async (req, res) => {
