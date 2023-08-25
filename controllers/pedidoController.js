@@ -246,12 +246,12 @@ const obtenerPedidosPorFecha = async (req, res) => {
             select: "nombre" // Solo seleccionamos el campo 'nombre' del driver
         })
         .populate({
-            path:"local",
+            path: "local",
             select: "nombre"
         })
         .populate({
-            path:"generadoPor",
-            select:"nombre"
+            path: "generadoPor",
+            select: "nombre"
         })
         .select("-detallePedido -gps -gpsCreacion -horaCreacion -medioDePago -tipoPedido");
 
@@ -272,16 +272,12 @@ const obtenerPedidosPorFechasYLocal = async (req, res) => {
         query.local = { $in: localIds };
     }
 
-    const pedidos = await Pedido.find(query).populate("driver", ).populate("local");
+    const pedidos = await Pedido.find(query).populate({path:"driver", select:" nombre"}).populate({path: "local", select:"nombre"}).populate({path:"generadoPor",select:"nombre"}).select("cobrar comVenta createdAt delivery direccion estadoPedido fecha hora telefono tipoPedido");
 
-    
+
 
     res.json(pedidos);
 };
-
-
-
-
 
 const obtenerMotorizados = async (req, res) => {
     const motorizados = await Usuario.find({ rol: "motorizado" }).select(

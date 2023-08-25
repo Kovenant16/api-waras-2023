@@ -35,6 +35,35 @@ const localSchema = mongoose.Schema(
             type: Boolean,
             default: true,
         },
+        tienda:{
+            type:Boolean
+        },
+        urlWeb: {
+            type:String
+        },
+        facebook:{
+            type:String
+        },
+        urlBanner: {
+            type:String
+        },
+        horario: {
+            type:String
+        },
+        ubicacion:{
+            type:String
+        },
+        tiempoPreparacion:{
+            type:String
+        },
+        direccion:{
+            type:String
+        },
+        diasAbiertos:[],
+        horaInicioFin:[],
+        adicionalPorTaper:{
+            type:String
+        }
     },
     {
         timestamps: true,

@@ -6,6 +6,7 @@ import usuarioRoutes from "./routes/usuarioRoutes.js";
 import pedidoRoutes from "./routes/pedidoRoutes.js";
 import localRoutes from "./routes/localRoutes.js";
 import clienteRoutes from "./routes/clienteRoutes.js";
+import productoRoutes from "./routes/productoRoutes.js"
 
 const app = express();
 app.use(express.json());
@@ -14,7 +15,7 @@ dotenv.config()
 conectarDB()
 
 //cors
-const whitelist = ['https://admin.warasdelivery.com','https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000"];
+const whitelist = ['https://admin.warasdelivery.com','https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.224:5173", "http://localhost:3000", "https://admin.warasdelivery.com"]
 
 
 
@@ -39,6 +40,7 @@ app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/pedidos", pedidoRoutes);
 app.use("/api/locales", localRoutes);
 app.use("/api/clientes", clienteRoutes);
+app.use("/api/tienda", productoRoutes);
 
 const PORT = 4000 //process.env.PORT || 4000
 
@@ -52,7 +54,7 @@ import {Server} from 'socket.io'
 const io = new Server(servidor, {
     pingTimeout:60000,
     cors:{
-        origin: ['https://admin.warasdelivery.com','https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.224:5173"]
+        origin: ['https://admin.warasdelivery.com','https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.224:5173", "http://localhost:3000", "https://admin.warasdelivery.com"]
     },
 });
 
