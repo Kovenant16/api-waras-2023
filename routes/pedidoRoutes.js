@@ -1,6 +1,6 @@
 import express from "express";
 import {
-    
+
     nuevoPedido,
     obtenerPedido,
     editarPedido,
@@ -21,24 +21,26 @@ import {
     marcarPedidoEnLocal,
     marcarPedidoRecogido,
     marcarPedidoEntregado,
-    obtenerPedidosPorFechasYLocal
+    obtenerPedidosPorFechasYLocal,
+    obtenerPedidosPorFechaYDriver
 } from "../controllers/pedidoController.js";
 import checkAuth from "../middleware/checkAuth.js";
 
 const router = express.Router();
 
-router.get("/", checkAuth, );
-router.get("/motorizados",  obtenerMotorizados);
+router.get("/", checkAuth,);
+router.get("/motorizados", obtenerMotorizados);
 router.get("/locales", obtenerLocales)
 router.get('/clientes/:telefono', obtenerClientes)
 router.get("/ultimosVeintePedidos", checkAuth, obtenerUltimosVeintePedidos);
 router.get("/pedidosNoEntregados", checkAuth, obtenerPedidosNoEntregados);
 router.get("/pedidosMotorizado", checkAuth, obtenerPedidosMotorizadoLogueado);
-router.post('/obtenerPedidosPorFecha',checkAuth, obtenerPedidosPorFecha)
-router.post('/obtenerPedidosPorFechasYLocal',checkAuth, obtenerPedidosPorFechasYLocal)
-router.post('/pedidosSocio',checkAuth, obtenerPedidosSocio)
-router.post('/pedidosMotorizado',  obtenerPedidosMotorizado)
-router.get('/pedidoSocio/:id',checkAuth, obtenerPedidoSocio)
+router.post('/obtenerPedidosPorFecha', checkAuth, obtenerPedidosPorFecha)
+router.post('/obtenerPedidosPorFechaYDriver', checkAuth, obtenerPedidosPorFechaYDriver)
+router.post('/obtenerPedidosPorFechasYLocal', checkAuth, obtenerPedidosPorFechasYLocal)
+router.post('/pedidosSocio', checkAuth, obtenerPedidosSocio)
+router.post('/pedidosMotorizado', obtenerPedidosMotorizado)
+router.get('/pedidoSocio/:id', checkAuth, obtenerPedidoSocio)
 router.post("/", checkAuth, nuevoPedido);
 router.put("/aceptarPedido/:id", checkAuth, aceptarPedido)
 router.put("/liberarPedido/:id", checkAuth, liberarPedido)

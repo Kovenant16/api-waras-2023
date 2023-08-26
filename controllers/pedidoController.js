@@ -104,7 +104,6 @@ const obtenerPedido = async (req, res) => {
             select: "",
         });
 
-    console.log(pedido);
     if (!pedido) {
         return res.status(404).json({ msg: "Pedido no encontrado" });
     }
@@ -258,6 +257,32 @@ const obtenerPedidosPorFecha = async (req, res) => {
     res.json(pedidos);
 };
 
+const obtenerPedidosPorFechaYDriver = async (req, res) => {
+    const { fecha, driver } = req.body; // Recuperar fecha y ID del driver desde el cuerpo de la solicitud
+    
+    const query = {
+        fecha,
+        driver: driver // Filtrar por el ID del driver
+    };
+    
+    const pedidos = await Pedido.find(query)
+        .populate({
+            path: "driver",
+            select: "nombre"
+        })
+        .populate({
+            path: "local",
+            select: "nombre"
+        })
+        .populate({
+            path: "generadoPor",
+            select: "nombre"
+        })
+        .select("-detallePedido -gps -gpsCreacion -horaCreacion -medioDePago -tipoPedido");
+
+    res.json(pedidos);
+};
+
 const obtenerPedidosPorFechasYLocal = async (req, res) => {
     const { fechas, localIds } = req.body;
 
@@ -277,6 +302,7 @@ const obtenerPedidosPorFechasYLocal = async (req, res) => {
 
 
     res.json(pedidos);
+    console.log(pedidos);
 };
 
 const obtenerMotorizados = async (req, res) => {
@@ -299,7 +325,7 @@ const obtenerClientes = async (req, res) => {
     const { telefono } = req.body; // Corregir aquí
     const clientes = await Cliente.find({ telefono });
 
-    console.log(telefono);
+    
 
     res.json(clientes);
 };
@@ -452,5 +478,6 @@ export {
     marcarPedidoEnLocal,
     marcarPedidoRecogido,
     marcarPedidoEntregado,
-    obtenerPedidosPorFechasYLocal
+    obtenerPedidosPorFechasYLocal,
+    obtenerPedidosPorFechaYDriver
 };
