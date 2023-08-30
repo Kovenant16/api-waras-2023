@@ -39,7 +39,7 @@ const obtenerPedidosNoEntregados = async (req, res) => {
             }
         )
         .populate(
-            { path: "local", select: "nombre" }
+            { path: "local", select: "nombre gps" }
         )
         .select(
             "-createdAt -gpsCreacion -horaCreacion -updatedAt -__v"
