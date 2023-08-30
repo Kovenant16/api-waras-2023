@@ -189,7 +189,8 @@ const autenticarUsuarioAdmin = async (req, res) => {
             nombre: usuario.nombre,
             email: usuario.email,
             token: generarJWT(usuario._id),
-            rol:usuario.rol
+            rol:usuario.rol,
+            organizacion:usuario.organizacion
         });
     } else {
         const error = new Error("El password es incorrecto");
@@ -244,7 +245,7 @@ const autenticarUsuarioSocio = async (req, res) => {
     const { email, password } = req.body;
 
     //comprobar si el usuario existe
-    const usuario = await Usuario.findOne({ email });
+    const usuario = await Usuario.findOne({ email }).populate({path:"organizacion", select: "direccion gps nombre telefonoUno"});
     if (!usuario) {
         const error = new Error("El usuario no existe");
         return res.status(404).json({ msg: error.message });
@@ -275,7 +276,8 @@ const autenticarUsuarioSocio = async (req, res) => {
             nombre: usuario.nombre,
             email: usuario.email,
             token: generarJWT(usuario._id),
-            rol:usuario.rol
+            rol:usuario.rol,
+            organizacion:usuario.organizacion
         });
     } else {
         const error = new Error("El password es incorrecto");
@@ -427,7 +429,12 @@ const toggleHabilitarUsuario = async(req, res) => {
 const perfil = async (req, res) => {
     const { usuario } = req;
 
-    res.json(usuario);
+    //const user = Usuario.findOne({id:usuario._id})
+
+
+    
+    const user = await Usuario.findOne({_id:usuario._id}).populate({path:"organizacion", select: "direccion gps nombre telefonoUno"}).select("email nombre organizacion rol telefono activo organizacion habilitado")
+    res.json(user)
 };
 
 export {

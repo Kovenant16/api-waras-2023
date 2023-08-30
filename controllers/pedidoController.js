@@ -28,17 +28,18 @@ const obtenerPedidosNoEntregados = async (req, res) => {
     const pedidos = await Pedido.find({
         estadoPedido: ["pendiente", "recogido", "sin asignar", "en local"],
     })
+        .populate({
+            path: "driver",
+            select: "nombre"
+        })
         .populate(
-            "driver",
-            "-confirmado -createdAt -habilitado -password -telefono -token -updatedAt -__v"
+            {
+                path: "generadoPor",
+                select: "nombre"
+            }
         )
         .populate(
-            "generadoPor",
-            "-confirmado -createdAt -habilitado -password -telefono -token -updatedAt -__v"
-        )
-        .populate(
-            "local",
-            "-colaboradores -createdAt -direccion -habilitado -telefonoUno -updatedAt -__v"
+            { path: "local", select: "nombre" }
         )
         .select(
             "-createdAt -gpsCreacion -horaCreacion -updatedAt -__v"
@@ -149,7 +150,7 @@ const obtenerPedidoSocio = async (req, res) => {
         .populate({
             path: "cliente",
             select: "",
-        });
+        }).limit(30);
 
     if (!pedido) {
         return res.status(404).json({ msg: "Pedido no encontrado" });
@@ -259,12 +260,12 @@ const obtenerPedidosPorFecha = async (req, res) => {
 
 const obtenerPedidosPorFechaYDriver = async (req, res) => {
     const { fecha, driver } = req.body; // Recuperar fecha y ID del driver desde el cuerpo de la solicitud
-    
+
     const query = {
         fecha,
         driver: driver // Filtrar por el ID del driver
     };
-    
+
     const pedidos = await Pedido.find(query)
         .populate({
             path: "driver",
@@ -297,7 +298,7 @@ const obtenerPedidosPorFechasYLocal = async (req, res) => {
         query.local = { $in: localIds };
     }
 
-    const pedidos = await Pedido.find(query).populate({path:"driver", select:" nombre"}).populate({path: "local", select:"nombre"}).populate({path:"generadoPor",select:"nombre"}).select("cobrar comVenta createdAt delivery direccion estadoPedido fecha hora telefono tipoPedido");
+    const pedidos = await Pedido.find(query).populate({ path: "driver", select: " nombre" }).populate({ path: "local", select: "nombre" }).populate({ path: "generadoPor", select: "nombre" }).select("cobrar comVenta createdAt delivery direccion estadoPedido fecha hora telefono tipoPedido");
 
 
 
@@ -325,14 +326,14 @@ const obtenerClientes = async (req, res) => {
     const { telefono } = req.body; // Corregir aquí
     const clientes = await Cliente.find({ telefono });
 
-    
+
 
     res.json(clientes);
 };
 
 const obtenerPedidosSocio = async (req, res) => {
     const { organizacion } = req.body;
-    const pedidosSocio = await Pedido.find({ local: organizacion }).populate("driver")
+    const pedidosSocio = await Pedido.find({ local: organizacion }).populate({path:"driver", select: "nombre"}).select("cobrar createdAt estadoPedido delivery direccion telefono local medioDePago tipoPedido")
     res.json(pedidosSocio);
 }
 
