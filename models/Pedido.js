@@ -59,6 +59,9 @@ const pedidosSchema = mongoose.Schema(
         horaRecojo: {
             type: String,
         },
+        horaLlegadaLocal: {
+            type: String,
+        },
         horaEntrega: {
             type: String,
         },

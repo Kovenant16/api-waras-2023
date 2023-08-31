@@ -333,7 +333,7 @@ const obtenerClientes = async (req, res) => {
 
 const obtenerPedidosSocio = async (req, res) => {
     const { organizacion } = req.body;
-    const pedidosSocio = await Pedido.find({ local: organizacion }).populate({path:"driver", select: "nombre"}).select("cobrar createdAt estadoPedido delivery direccion telefono local medioDePago tipoPedido")
+    const pedidosSocio = await Pedido.find({ local: organizacion }).populate({path:"driver", select: "nombre"}).select("cobrar horaLlegada horaRecojo hora fecha createdAt estadoPedido delivery direccion telefono local medioDePago tipoPedido")
     res.json(pedidosSocio);
 }
 
@@ -355,8 +355,8 @@ const aceptarPedido = async (req, res) => {
         }
 
         if (!pedido.driver) {
-            pedido.driver = req.body.driver || pedido.driver;
-            pedido.estadoPedido = "pendiente" || pedido.estadoPedido;
+            pedido.driver = req.body.driver;
+            pedido.estadoPedido = "pendiente"
             const pedidoGuardado = await pedido.save();
             res.json(pedidoGuardado);
         } else {
@@ -406,7 +406,8 @@ const marcarPedidoEnLocal = async (req, res) => {
             return res.status(404).json({ msg: error.message });
         }
 
-        pedido.estadoPedido = "en local"; // Cambiar el estado del pedido
+        pedido.estadoPedido = "en local";
+        pedido.horaLlegadaLocal = new Date().toISOString(); // Cambiar el estado del pedido
         const pedidoGuardado = await pedido.save();
         res.json(pedidoGuardado);
     } catch (error) {
@@ -414,6 +415,7 @@ const marcarPedidoEnLocal = async (req, res) => {
         res.status(500).json({ msg: "Error interno del servidor" });
     }
 };
+
 const marcarPedidoRecogido = async (req, res) => {
     const { id } = req.params;
 
@@ -425,7 +427,8 @@ const marcarPedidoRecogido = async (req, res) => {
             return res.status(404).json({ msg: error.message });
         }
 
-        pedido.estadoPedido = "recogido"; // Cambiar el estado del pedido
+        pedido.estadoPedido = "recogido";
+        pedido.horaRecojo = new Date().toISOString();  // Cambiar el estado del pedido
         const pedidoGuardado = await pedido.save();
         res.json(pedidoGuardado);
     } catch (error) {
@@ -445,7 +448,8 @@ const marcarPedidoEntregado = async (req, res) => {
             return res.status(404).json({ msg: error.message });
         }
 
-        pedido.estadoPedido = "entregado"; // Cambiar el estado del pedido
+        pedido.estadoPedido = "entregado";
+        pedido.horaEntrega = new Date().toISOString();  // Cambiar el estado del pedido
         const pedidoGuardado = await pedido.save();
         res.json(pedidoGuardado);
     } catch (error) {
