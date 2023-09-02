@@ -22,7 +22,8 @@ import {
     marcarPedidoRecogido,
     marcarPedidoEntregado,
     obtenerPedidosPorFechasYLocal,
-    obtenerPedidosPorFechaYDriver
+    obtenerPedidosPorFechaYDriver,
+    obtenerPedidosPorTelefono
 } from "../controllers/pedidoController.js";
 import checkAuth from "../middleware/checkAuth.js";
 
@@ -31,7 +32,7 @@ const router = express.Router();
 router.get("/", checkAuth,);
 router.get("/motorizados", obtenerMotorizados);
 router.get("/locales", obtenerLocales)
-router.get('/clientes/:telefono', obtenerClientes)
+router.post('/obtenerClientes/',checkAuth, obtenerClientes)
 router.get("/ultimosVeintePedidos", checkAuth, obtenerUltimosVeintePedidos);
 router.get("/pedidosNoEntregados", checkAuth, obtenerPedidosNoEntregados);
 router.get("/pedidosMotorizado", checkAuth, obtenerPedidosMotorizadoLogueado);
@@ -42,6 +43,7 @@ router.post('/pedidosSocio', checkAuth, obtenerPedidosSocio)
 router.post('/pedidosMotorizado', obtenerPedidosMotorizado)
 router.get('/pedidoSocio/:id', checkAuth, obtenerPedidoSocio)
 router.post("/", checkAuth, nuevoPedido);
+router.post("/obtenerPedidosPorTelefono", checkAuth,obtenerPedidosPorTelefono)
 router.put("/aceptarPedido/:id", checkAuth, aceptarPedido)
 router.put("/liberarPedido/:id", checkAuth, liberarPedido)
 router.put("/marcarEnLocal/:id", checkAuth, marcarPedidoEnLocal)
