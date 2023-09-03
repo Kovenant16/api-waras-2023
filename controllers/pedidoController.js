@@ -255,14 +255,15 @@ const obtenerPedidosPorFecha = async (req, res) => {
 
 const obtenerPedidosPorTelefono = async (req, res) => {
     try {
-        let { telefono } = req.body; // Puedes cambiar esto según cómo se envíe el número de teléfono en tu solicitud
-        // Validar el número de teléfono aquí si es necesario
-
-        // Eliminar espacios en blanco del número de teléfono
+        let { telefono } = req.body;
         telefono = telefono.replace(/\s+/g, '');
 
-        const pedidos = await Pedido.find({ telefono, gps: { $ne: "" } }).populate({path:"local", select:"nombre"}) // Filtra por número de teléfono sin espacios y campo "gps" no igual a ""
-            
+        // Utiliza distinct para obtener valores únicos de la propiedad "gps"
+        const gpsUnicos = await Pedido.distinct("gps", { telefono, gps: { $ne: "" } });
+
+        // Ahora puedes usar estos valores únicos en tu consulta principal
+        const pedidos = await Pedido.find({ telefono, gps: { $in: gpsUnicos } })
+            .populate({ path: "local", select: "nombre" })
             .select("-detallePedido -gpsCreacion -horaCreacion -medioDePago -tipoPedido");
 
         res.json(pedidos);
