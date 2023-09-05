@@ -109,13 +109,13 @@ const obtenerPedido = async (req, res) => {
         return res.status(404).json({ msg: "Pedido no encontrado" });
     }
 
-    
-    
-        return res.json(pedido);
-    
 
-    
-    
+
+    return res.json(pedido);
+
+
+
+
 };
 
 const obtenerPedidoSocio = async (req, res) => {
@@ -253,18 +253,26 @@ const obtenerPedidosPorFecha = async (req, res) => {
     res.json(pedidos);
 };
 
-const obtenerPedidosPorTelefono = async (req, res) => {
+const obtenerPedidosPorTelefonoConGps = async (req, res) => {
     try {
         let { telefono } = req.body;
         telefono = telefono.replace(/\s+/g, '');
 
-        // Utiliza distinct para obtener valores únicos de la propiedad "gps"
-        const gpsUnicos = await Pedido.distinct("gps", { telefono, gps: { $ne: "" } });
+        // Realiza una consulta para obtener todos los valores de GPS sin duplicados
+        const gpsUnicos = await Pedido.find({ telefono, gps: { $ne: "" } }).distinct("gps");
 
         // Ahora puedes usar estos valores únicos en tu consulta principal
         const pedidos = await Pedido.find({ telefono, gps: { $in: gpsUnicos } })
             .populate({ path: "local", select: "nombre" })
-            .select("-detallePedido -gpsCreacion -horaCreacion -medioDePago -tipoPedido");
+            .select("-detallePedido -gpsCreacion -horaCreacion -medioDePago -tipoPedido")
+            .limit(6);
+
+        // Ordena los pedidos por fecha en orden descendente
+        pedidos.sort((a, b) => {
+            const fechaA = new Date(a.fecha); // Convierte la fecha en un objeto Date
+            const fechaB = new Date(b.fecha);
+            return fechaB - fechaA; // Orden descendente
+        });
 
         res.json(pedidos);
         console.log(pedidos);
@@ -273,6 +281,39 @@ const obtenerPedidosPorTelefono = async (req, res) => {
         res.status(500).json({ error: "Error al obtener los pedidos." });
     }
 };
+
+const obtenerPedidosSinGPS = async (req, res) => {
+    try {
+        let { telefono } = req.body;
+        telefono = telefono.replace(/\s+/g, '');
+
+        // Realiza una consulta para obtener todos los pedidos que no tienen "gps" o tienen "gps" como una cadena vacía
+        const pedidosSinGPS = await Pedido.find({
+            telefono,
+            $or: [
+                { gps: { $exists: false } },
+                { gps: "" }
+            ]
+        })
+        .populate({ path: "local", select: "nombre" })
+        .select("-detallePedido -gpsCreacion -horaCreacion -medioDePago -tipoPedido").limit(6);
+
+        // Ordena los pedidos por fecha en formato "YYYY-MM-DD" de manera descendente
+        pedidosSinGPS.sort((a, b) => {
+            const fechaA = a.fecha;
+            const fechaB = b.fecha;
+            if (fechaA < fechaB) return 1; // Orden descendente
+            if (fechaA > fechaB) return -1;
+            return 0;
+        });
+
+        res.json(pedidosSinGPS);
+        console.log(pedidosSinGPS);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error al obtener los pedidos sin GPS." });
+    }
+}
 
 
 const obtenerPedidosPorFechaYDriver = async (req, res) => {
@@ -322,6 +363,8 @@ const obtenerPedidosPorFechasYLocal = async (req, res) => {
     res.json(pedidos);
 };
 
+
+
 const obtenerMotorizados = async (req, res) => {
     const motorizados = await Usuario.find({ rol: "motorizado" }).select(
         " -createdAt   -password -rol -token -updatedAt -__v "
@@ -349,7 +392,7 @@ const obtenerClientes = async (req, res) => {
 
 const obtenerPedidosSocio = async (req, res) => {
     const { organizacion } = req.body;
-    const pedidosSocio = await Pedido.find({ local: organizacion }).populate({path:"driver", select: "nombre"}).select("cobrar horaLlegada horaRecojo hora fecha createdAt estadoPedido delivery direccion telefono local medioDePago tipoPedido")
+    const pedidosSocio = await Pedido.find({ local: organizacion }).populate({ path: "driver", select: "nombre" }).select("cobrar horaLlegada horaRecojo hora fecha createdAt estadoPedido delivery direccion telefono local medioDePago tipoPedido")
     res.json(pedidosSocio);
     console.log("pedidos socio obtenidos", organizacion)
 }
@@ -502,5 +545,6 @@ export {
     marcarPedidoEntregado,
     obtenerPedidosPorFechasYLocal,
     obtenerPedidosPorFechaYDriver,
-    obtenerPedidosPorTelefono
+    obtenerPedidosPorTelefonoConGps,
+    obtenerPedidosSinGPS
 };
