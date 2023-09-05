@@ -295,7 +295,7 @@ const obtenerPedidosSinGPS = async (req, res) => {
             ]
         })
         .populate({ path: "local", select: "nombre" })
-        .select("delivery direccion fecha local").limit(6);
+        .select("delivery direccion fecha local gps").limit(6);
 
         // Ordena los pedidos por fecha en formato "YYYY-MM-DD" de manera descendente
         pedidosSinGPS.sort((a, b) => {
