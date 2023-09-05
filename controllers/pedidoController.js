@@ -264,7 +264,7 @@ const obtenerPedidosPorTelefonoConGps = async (req, res) => {
         // Ahora puedes usar estos valores únicos en tu consulta principal
         const pedidos = await Pedido.find({ telefono, gps: { $in: gpsUnicos } })
             .populate({ path: "local", select: "nombre" })
-            .select("-detallePedido -gpsCreacion -horaCreacion -medioDePago -tipoPedido")
+            .select("delivery direccion fecha local")
             .limit(6);
 
         // Ordena los pedidos por fecha en orden descendente
@@ -275,7 +275,6 @@ const obtenerPedidosPorTelefonoConGps = async (req, res) => {
         });
 
         res.json(pedidos);
-        console.log(pedidos);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Error al obtener los pedidos." });
@@ -296,7 +295,7 @@ const obtenerPedidosSinGPS = async (req, res) => {
             ]
         })
         .populate({ path: "local", select: "nombre" })
-        .select("-detallePedido -gpsCreacion -horaCreacion -medioDePago -tipoPedido").limit(6);
+        .select("delivery direccion fecha local").limit(6);
 
         // Ordena los pedidos por fecha en formato "YYYY-MM-DD" de manera descendente
         pedidosSinGPS.sort((a, b) => {
@@ -308,7 +307,6 @@ const obtenerPedidosSinGPS = async (req, res) => {
         });
 
         res.json(pedidosSinGPS);
-        console.log(pedidosSinGPS);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Error al obtener los pedidos sin GPS." });
