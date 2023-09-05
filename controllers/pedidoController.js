@@ -264,7 +264,7 @@ const obtenerPedidosPorTelefonoConGps = async (req, res) => {
         // Ahora puedes usar estos valores únicos en tu consulta principal
         const pedidos = await Pedido.find({ telefono, gps: { $in: gpsUnicos } })
             .populate({ path: "local", select: "nombre" })
-            .select("delivery direccion fecha local")
+            .select("delivery direccion fecha local gps")
             .limit(6);
 
         // Ordena los pedidos por fecha en orden descendente
