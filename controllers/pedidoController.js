@@ -261,25 +261,32 @@ const obtenerPedidosPorTelefonoConGps = async (req, res) => {
         // Realiza una consulta para obtener todos los valores de GPS sin duplicados
         const gpsUnicos = await Pedido.find({ telefono, gps: { $ne: "" } }).distinct("gps");
 
-        // Ahora puedes usar estos valores únicos en tu consulta principal
+        // Consulta los pedidos usando los valores únicos de GPS
         const pedidos = await Pedido.find({ telefono, gps: { $in: gpsUnicos } })
             .populate({ path: "local", select: "nombre" })
             .select("delivery direccion fecha local gps")
-            .limit(6);
+            .sort({ fecha: -1 }); // Ordena los pedidos por fecha en orden descendente
 
-        // Ordena los pedidos por fecha en orden descendente
-        pedidos.sort((a, b) => {
-            const fechaA = new Date(a.fecha); // Convierte la fecha en un objeto Date
-            const fechaB = new Date(b.fecha);
-            return fechaB - fechaA; // Orden descendente
+        // Utiliza un objeto auxiliar para rastrear los pedidos más recientes para cada valor de "gps"
+        const pedidosFiltrados = {};
+        pedidos.forEach((pedido) => {
+            const gps = pedido.gps;
+            if (!pedidosFiltrados[gps] || pedido.fecha > pedidosFiltrados[gps].fecha) {
+                pedidosFiltrados[gps] = pedido;
+            }
         });
 
-        res.json(pedidos);
+        // Convierte el objeto de pedidos filtrados en un arreglo
+        const resultado = Object.values(pedidosFiltrados);
+
+        res.json(resultado);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Error al obtener los pedidos." });
     }
 };
+
+
 
 const obtenerPedidosSinGPS = async (req, res) => {
     try {
@@ -295,10 +302,23 @@ const obtenerPedidosSinGPS = async (req, res) => {
             ]
         })
         .populate({ path: "local", select: "nombre" })
-        .select("delivery direccion fecha local gps").limit(6);
+        .sort({fecha: -1})
+        .select("delivery direccion fecha local gps").limit(5);
+
+        // Utiliza un conjunto para mantener un registro de direcciones únicas
+        const direccionesUnicas = new Set();
+
+        // Filtra los resultados para eliminar direcciones duplicadas
+        const pedidosFiltrados = pedidosSinGPS.filter(pedido => {
+            if (!direccionesUnicas.has(pedido.direccion)) {
+                direccionesUnicas.add(pedido.direccion);
+                return true;
+            }
+            return false;
+        });
 
         // Ordena los pedidos por fecha en formato "YYYY-MM-DD" de manera descendente
-        pedidosSinGPS.sort((a, b) => {
+        pedidosFiltrados.sort((a, b) => {
             const fechaA = a.fecha;
             const fechaB = b.fecha;
             if (fechaA < fechaB) return 1; // Orden descendente
@@ -306,12 +326,13 @@ const obtenerPedidosSinGPS = async (req, res) => {
             return 0;
         });
 
-        res.json(pedidosSinGPS);
+        res.json(pedidosFiltrados);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Error al obtener los pedidos sin GPS." });
     }
 }
+
 
 
 const obtenerPedidosPorFechaYDriver = async (req, res) => {
