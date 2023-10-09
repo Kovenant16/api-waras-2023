@@ -437,6 +437,14 @@ const perfil = async (req, res) => {
     res.json(user)
 };
 
+const obtenerUsuarioPorEmail = async(req, res) => {
+    const {email} = req.body;
+
+    const usuarios = await Usuario.findOne({email})
+
+    res.json(usuarios)
+}
+
 export {
     registrarUsuario,
     autenticarUsuarioAdmin,
@@ -452,4 +460,5 @@ export {
     comprobarToken,
     nuevoPassword,
     perfil,
+    obtenerUsuarioPorEmail
 };

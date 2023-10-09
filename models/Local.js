@@ -36,9 +36,10 @@ const localSchema = mongoose.Schema(
             default: true,
         },
         tienda:{
-            type:Boolean
+            type:Boolean,
+            default:false
         },
-        urlWeb: {
+        ruta: {
             type:String
         },
         facebook:{
@@ -56,13 +57,13 @@ const localSchema = mongoose.Schema(
         tiempoPreparacion:{
             type:String
         },
-        direccion:{
-            type:String
-        },
         diasAbiertos:[],
         horaInicioFin:[],
         adicionalPorTaper:{
             type:String
+        },
+        versionCarta:{
+            type:Number
         }
     },
     {

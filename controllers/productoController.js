@@ -4,7 +4,7 @@ import Local from "../models/Local.js";
 
 
 const obtenerTiendas = async (req, res) => {
-    const tiendas = await Local.find({ tienda: true }).select("nombre direccion gps urlLogo diasAbiertos telefonoUno ruta");
+    const tiendas = await Local.find({ tienda: true }).select("nombre direccion gps urlLogo diasAbiertos telefonoUno ruta horario ubicacion tiempoPreparacion horaInicioFin adicionalPorTaper");
     res.json(tiendas);
     console.log('tiendas obtenidas');
 }
@@ -29,9 +29,37 @@ const obtenerTienda = async (req, res) => {
     }
 };
 
+const obtenerProductosPorTienda = async (req, res) => {
+    const { idLocal } = req.body;
+    console.log("ID de la tienda:", idLocal);
+    
+
+    try {
+        // Verifica si idLocal es un valor válido antes de realizar la consulta
+        if (!idLocal) {
+            return res.status(400).json({ error: "ID de tienda no proporcionado" });
+        }
+
+        // Utiliza async/await para esperar la consulta a la base de datos
+        const productos = await Producto.find({ local: idLocal }).sort({ precio: 1 });
+
+        if (!productos || productos.length === 0) {
+            return res.status(404).json({ error: "No se encontraron productos para esta tienda" });
+        }
+
+        // Envía la respuesta con los productos encontrados
+        res.json(productos);
+
+        console.log("productos obtenidos",productos.length);
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+};
+
 
 const agregarProducto = async (req, res) => {
-    const { localId, nombre, categoria, descripcion, precio, imagen, preciosCompetencia } = req.body;
+    const { localId, nombre, categoria,subcategorias, descripcion, precio,taper, imagen, preciosCompetencia, cover } = req.body;
 
     const nuevoProducto = new Producto({
         local: localId,
@@ -40,7 +68,10 @@ const agregarProducto = async (req, res) => {
         descripcion,
         precio,
         imagen,
-        preciosCompetencia
+        preciosCompetencia,
+        subcategorias,
+        taper,
+        cover
     });
 
     try {
@@ -56,5 +87,7 @@ const agregarProducto = async (req, res) => {
 
 export {
     obtenerTiendas,
-    obtenerTienda
+    obtenerTienda,
+    agregarProducto,
+    obtenerProductosPorTienda
 };
