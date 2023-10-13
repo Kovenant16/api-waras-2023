@@ -41,7 +41,7 @@ const obtenerProductosPorTienda = async (req, res) => {
         }
 
         // Utiliza async/await para esperar la consulta a la base de datos
-        const productos = await Producto.find({ local: idLocal }).sort({ precio: 1 });
+        const productos = await Producto.find({ local: idLocal })
 
         if (!productos || productos.length === 0) {
             return res.status(404).json({ error: "No se encontraron productos para esta tienda" });
@@ -83,11 +83,69 @@ const agregarProducto = async (req, res) => {
     }
 }
 
+const eliminarProducto = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Primero, verifica si el producto existe en la base de datos
+        const producto = await Producto.findById(id);
+
+        if (!producto) {
+            return res.status(404).json({ mensaje: 'Producto no encontrado' });
+        }
+
+        // Si el producto existe, elimínalo
+        await producto.deleteOne();
+
+        res.status(200).json({ mensaje: 'Producto eliminado con éxito' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ mensaje: 'Error en el servidor' });
+    }
+}
+
+const editarProducto = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const producto = await Producto.findById(id);
+
+        if (!producto) {
+            return res.status(404).json({ msg: "Producto no encontrado" });
+        }
+
+        // Aquí puedes realizar una validación para determinar si el usuario tiene permiso para editar el producto.
+        // Por ejemplo, si solo los administradores pueden editar productos:
+        // if (req.usuario.rol !== "Administrador") {
+        //     return res.status(403).json({ msg: "No tienes permiso para editar productos" });
+        // }
+
+        // Ahora actualizamos los campos del producto con los valores del cuerpo de la solicitud (req.body).
+        producto.nombre = req.body.nombre || producto.nombre;
+        producto.categoria = req.body.categoria || producto.categoria;
+        producto.descripcion = req.body.descripcion || producto.descripcion;
+        producto.subcategorias = req.body.subcategorias || producto.subcategorias;
+        producto.precio = req.body.precio || producto.precio;
+        producto.cover = req.body.cover || producto.cover;
+        producto.taper = req.body.taper || producto.taper;
+        producto.preciosCompetencia = req.body.preciosCompetencia || producto.preciosCompetencia;
+        producto.local = req.body.local || producto.local;
+
+        const productoActualizado = await producto.save();
+        res.json(productoActualizado);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error al editar el producto" });
+    }
+};
+
 
 
 export {
     obtenerTiendas,
     obtenerTienda,
     agregarProducto,
-    obtenerProductosPorTienda
+    obtenerProductosPorTienda,
+    eliminarProducto,
+    editarProducto
 };

@@ -301,9 +301,9 @@ const obtenerPedidosSinGPS = async (req, res) => {
                 { gps: "" }
             ]
         })
-        .populate({ path: "local", select: "nombre" })
-        .sort({fecha: -1})
-        .select("delivery direccion fecha local gps").limit(5);
+            .populate({ path: "local", select: "nombre" })
+            .sort({ fecha: -1 })
+            .select("delivery direccion fecha local gps").limit(5);
 
         // Utiliza un conjunto para mantener un registro de direcciones únicas
         const direccionesUnicas = new Set();
@@ -375,7 +375,12 @@ const obtenerPedidosPorFechasYLocal = async (req, res) => {
         query.local = { $in: localIds };
     }
 
-    const pedidos = await Pedido.find(query).populate({ path: "driver", select: " nombre" }).populate({ path: "local", select: "nombre" }).populate({ path: "generadoPor", select: "nombre" }).select("cobrar horaLlegadaLocal horaRecojo horaEntrega comVenta createdAt delivery direccion estadoPedido fecha hora telefono tipoPedido");
+    const pedidos = await Pedido.find(query)
+    .populate({ path: "driver", select: " nombre" })
+    .populate({ path: "local", select: "nombre" })
+    .populate({ path: "generadoPor", select: "nombre" })
+    .select("cobrar horaLlegadaLocal detallePedido horaRecojo horaEntrega comVenta createdAt delivery direccion estadoPedido fecha hora telefono tipoPedido")
+    .sort({ fecha: 1 });
 
 
 
