@@ -4,7 +4,7 @@ import Local from "../models/Local.js";
 
 
 const obtenerTiendas = async (req, res) => {
-    const tiendas = await Local.find({ tienda: true }).select("nombre direccion gps urlLogo diasAbiertos telefonoUno ruta horario ubicacion tiempoPreparacion horaInicioFin adicionalPorTaper");
+    const tiendas = await Local.find({ tienda: true }).select("nombre direccion gps urlLogo diasAbiertos telefonoUno ruta horario ubicacion tiempoPreparacion horaInicioFin adicionalPorTaper tags");
     res.json(tiendas);
     console.log('tiendas obtenidas');
 }
@@ -57,9 +57,52 @@ const obtenerProductosPorTienda = async (req, res) => {
     }
 };
 
+const obtenerProductosPorCategoria = async (req, res) => {
+    const { categoria } = req.body;
+    console.log("Categoría:", categoria);
+
+    try {
+        if (!categoria) {
+            return res.status(400).json({ error: "Categoría no proporcionada" });
+        }
+
+        // Utiliza async/await para esperar la consulta a la base de datos
+        const productos = await Producto.find({ categoria }).populate("local", "nombre urlLogo ruta");
+
+        if (!productos || productos.length === 0) {
+            return res.status(404).json({ error: "No se encontraron productos en esta categoría" });
+        }
+
+        // Filtrar y limitar a 5 productos de cada local
+        const productosFiltrados = {};
+        productos.forEach((producto) => {
+            const localNombre = producto.local.nombre;
+            if (!productosFiltrados[localNombre]) {
+                productosFiltrados[localNombre] = [];
+            }
+            if (productosFiltrados[localNombre].length < 5) {
+                productosFiltrados[localNombre].push(producto);
+            }
+        });
+
+        // Convertir el objeto de productos filtrados en un array
+        const resultado = Object.values(productosFiltrados).flat();
+
+        // Envía la respuesta con los productos encontrados
+        res.json(resultado);
+
+        console.log("Productos encontrados en la categoría:", resultado.length);
+    } catch (error) {
+        console.error("Error al obtener productos por categoría:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+};
+
+
+
 
 const agregarProducto = async (req, res) => {
-    const { localId, nombre, categoria,subcategorias, descripcion, precio,taper, imagen, preciosCompetencia, cover } = req.body;
+    const { localId, nombre, categoria,subcategorias, descripcion, precio,taper, imagen, preciosCompetencia, cover, opciones, tags, opcionesMultiples } = req.body;
 
     const nuevoProducto = new Producto({
         local: localId,
@@ -71,7 +114,10 @@ const agregarProducto = async (req, res) => {
         preciosCompetencia,
         subcategorias,
         taper,
-        cover
+        cover,
+        opciones,
+        tags,
+        opcionesMultiples
     });
 
     try {
@@ -82,6 +128,8 @@ const agregarProducto = async (req, res) => {
         res.status(500).json({ mensaje: 'Error en el servidor' });
     }
 }
+
+
 
 const eliminarProducto = async (req, res) => {
     const { id } = req.params;
@@ -147,5 +195,6 @@ export {
     agregarProducto,
     obtenerProductosPorTienda,
     eliminarProducto,
-    editarProducto
+    editarProducto,
+    obtenerProductosPorCategoria
 };

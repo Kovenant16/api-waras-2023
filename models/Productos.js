@@ -25,6 +25,18 @@ const productoSchema = mongoose.Schema({
             logoCompetidor: String,
         },
     ],
+    opciones:[
+        {
+            nombre:String,
+            precio:Number
+        }
+    ],
+    opcionesMultiples:[
+        {
+            nombre:String,
+            precio:Number
+        }
+    ]
 });
 
 const Producto = mongoose.model("Producto", productoSchema);

@@ -5,7 +5,8 @@ import {
     agregarProducto,
     obtenerProductosPorTienda,
     eliminarProducto,
-    editarProducto
+    editarProducto,
+    obtenerProductosPorCategoria
 } from '../controllers/productoController.js'
 import checkAuth from '../middleware/checkAuth.js';
 
@@ -17,5 +18,6 @@ router.post("/agregarProducto", agregarProducto)
 router.put("/:id", editarProducto);
 router.delete("/:id", eliminarProducto)
 router.post("/obtenerProductosPorTienda", obtenerProductosPorTienda)
+router.post("/obtenerProductosPorCategoria", obtenerProductosPorCategoria)
 
 export default router;
