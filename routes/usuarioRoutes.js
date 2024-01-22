@@ -7,8 +7,10 @@ import {
     registrarUsuarioAdmin,
     registrarUsuarioSocio,
     registrarUsuarioMoto,
+    registrarUsuarioAtencion,
     autenticarUsuarioMotorizado,
     autenticarUsuarioSocio,
+    autenticarUsuarioAtencion,
     confirmarUsuario,
     olvidePassword,
     olvidePasswordMoto,
@@ -16,7 +18,8 @@ import {
     comprobarToken,
     nuevoPassword,
     perfil,
-    obtenerUsuarioPorEmail
+    obtenerUsuarioPorEmail,
+    toggleActivarUsuario
 } from "../controllers/usuarioController.js";
 
 import checkAuth from "../middleware/checkAuth.js";
@@ -24,12 +27,15 @@ import checkAuth from "../middleware/checkAuth.js";
 //auth, registro y confirmacion de usuarios
 
 router.post("/", registrarUsuario)
+router.put("/toggleActivarUsuario", toggleActivarUsuario)
 router.post("/registrarAdmin", registrarUsuarioAdmin);
 router.post("/registrarSocio", registrarUsuarioSocio);
 router.post("/registrarMoto", registrarUsuarioMoto);
+router.post("/registrarAtencion", registrarUsuarioAtencion);
 router.post("/loginMoto", autenticarUsuarioMotorizado)
 router.post("/login", autenticarUsuarioAdmin);
-router.post("/loginSocio", autenticarUsuarioSocio)
+router.post("/loginSocio", autenticarUsuarioSocio);
+router.post("/loginAtencion", autenticarUsuarioAtencion);
 router.get("/confirmar/:token", confirmarUsuario);
 router.post("/olvide-password", olvidePassword);
 router.post("/olvide-password-moto", olvidePasswordMoto);

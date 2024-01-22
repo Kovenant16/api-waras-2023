@@ -286,6 +286,27 @@ const obtenerPedidosPorTelefonoConGps = async (req, res) => {
     }
 };
 
+const obtenerPedidosPorTelefono = async (req, res) => {
+    try {
+        let { telefono } = req.body;
+        telefono = telefono.replace(/\s+/g, '');
+
+        // Realiza una consulta para obtener todos los valores de GPS sin duplicados
+
+
+        // Consulta los pedidos usando los valores únicos de GPS
+        const pedidos = await Pedido.find({ telefono })
+            .populate({ path: "local", select: "nombre" })
+            .select("delivery direccion fecha local gps telefono")
+            .sort({ fecha: -1 })
+            .limit(20); // Ordena los pedidos por fecha en orden descendente
+        res.json(pedidos);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error al obtener los pedidos." });
+    }
+};
+
 
 
 const obtenerPedidosSinGPS = async (req, res) => {
@@ -376,11 +397,11 @@ const obtenerPedidosPorFechasYLocal = async (req, res) => {
     }
 
     const pedidos = await Pedido.find(query)
-    .populate({ path: "driver", select: " nombre" })
-    .populate({ path: "local", select: "nombre" })
-    .populate({ path: "generadoPor", select: "nombre" })
-    .select("cobrar horaLlegadaLocal detallePedido horaRecojo horaEntrega comVenta createdAt delivery direccion estadoPedido fecha hora telefono tipoPedido")
-    .sort({ fecha: 1 });
+        .populate({ path: "driver", select: " nombre" })
+        .populate({ path: "local", select: "nombre" })
+        .populate({ path: "generadoPor", select: "nombre" })
+        .select("cobrar horaLlegadaLocal detallePedido horaRecojo horaEntrega comVenta createdAt delivery direccion estadoPedido fecha hora telefono tipoPedido")
+        .sort({ fecha: 1 });
 
 
 
@@ -390,7 +411,7 @@ const obtenerPedidosPorFechasYLocal = async (req, res) => {
 
 
 const obtenerMotorizados = async (req, res) => {
-    const motorizados = await Usuario.find({ rol: "motorizado" }).select(
+    const motorizados = await Usuario.find({ rol: "motorizado", habilitado: true }).select(
         " -createdAt   -password -rol -token -updatedAt -__v "
     ).sort({ nombre: 1 });;
 
@@ -570,5 +591,6 @@ export {
     obtenerPedidosPorFechasYLocal,
     obtenerPedidosPorFechaYDriver,
     obtenerPedidosPorTelefonoConGps,
-    obtenerPedidosSinGPS
+    obtenerPedidosSinGPS,
+    obtenerPedidosPorTelefono
 };

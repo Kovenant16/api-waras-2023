@@ -9,6 +9,11 @@ const obtenerTiendas = async (req, res) => {
     console.log('tiendas obtenidas');
 }
 
+const obtenerTiendasTotales = async (req, res) => {
+    const tiendas = await Local.find().select("nombre direccion gps urlLogo diasAbiertos telefonoUno ruta horario ubicacion tiempoPreparacion horaInicioFin adicionalPorTaper tags").sort({nombre:1});
+    res.json(tiendas);
+}
+
 const obtenerTienda = async (req, res) => {
     const { ruta } = req.params; // Obtiene el valor de "ruta" desde los parámetros
 
@@ -98,11 +103,8 @@ const obtenerProductosPorCategoria = async (req, res) => {
     }
 };
 
-
-
-
 const agregarProducto = async (req, res) => {
-    const { localId, nombre, categoria,subcategorias, descripcion, precio,taper, imagen, preciosCompetencia, cover, opciones, tags, opcionesMultiples } = req.body;
+    const { localId, nombre, categoria,subcategorias, descripcion, precio,taper, preciosCompetencia, cover, opciones, tags, opcionesMultiples } = req.body;
 
     const nuevoProducto = new Producto({
         local: localId,
@@ -110,13 +112,11 @@ const agregarProducto = async (req, res) => {
         categoria,
         descripcion,
         precio,
-        imagen,
         preciosCompetencia,
         subcategorias,
         taper,
         cover,
         opciones,
-        tags,
         opcionesMultiples
     });
 
@@ -196,5 +196,6 @@ export {
     obtenerProductosPorTienda,
     eliminarProducto,
     editarProducto,
-    obtenerProductosPorCategoria
+    obtenerProductosPorCategoria,
+    obtenerTiendasTotales
 };

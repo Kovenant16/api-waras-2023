@@ -6,13 +6,15 @@ import {
     obtenerProductosPorTienda,
     eliminarProducto,
     editarProducto,
-    obtenerProductosPorCategoria
+    obtenerProductosPorCategoria,
+    obtenerTiendasTotales
 } from '../controllers/productoController.js'
 import checkAuth from '../middleware/checkAuth.js';
 
 const router = express.Router();
 
 router.get("/tiendas", obtenerTiendas)
+router.get("/tiendasTotales", obtenerTiendasTotales)
 router.get("/:ruta", obtenerTienda)
 router.post("/agregarProducto", agregarProducto)
 router.put("/:id", editarProducto);
