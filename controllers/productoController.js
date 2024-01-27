@@ -62,6 +62,32 @@ const obtenerProductosPorTienda = async (req, res) => {
     }
 };
 
+const obtenerProductoPorId = async (req, res) => {
+    const { productoId } = req.params; // Cambiado de req.body a req.params para obtener el ID desde los parámetros de la URL
+    console.log("ID del producto:", productoId);
+
+    try {
+        if (!productoId) {
+            return res.status(400).json({ error: "ID de producto no proporcionado" });
+        }
+
+        // Utiliza async/await para esperar la consulta a la base de datos
+        const producto = await Producto.findById(productoId).populate("local");
+
+        if (!producto) {
+            return res.status(404).json({ error: "No se encontró un producto con ese ID" });
+        }
+
+        // Envía la respuesta con el producto encontrado
+        res.json(producto);
+
+        console.log("Producto encontrado:", producto);
+    } catch (error) {
+        console.error("Error al obtener producto por ID:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+};
+
 const obtenerProductosPorCategoria = async (req, res) => {
     const { categoria } = req.body;
     console.log("Categoría:", categoria);
@@ -194,6 +220,7 @@ export {
     obtenerTienda,
     agregarProducto,
     obtenerProductosPorTienda,
+    obtenerProductoPorId,
     eliminarProducto,
     editarProducto,
     obtenerProductosPorCategoria,
