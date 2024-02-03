@@ -16,7 +16,7 @@ dotenv.config()
 conectarDB()
 
 //cors
-const whitelist = ['https://admin.warasdelivery.com','https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.24:5173", "http://localhost:3000", "https://admin.warasdelivery.com"]
+const whitelist = ['https://admin.warasdelivery.com','https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.24:5173", "http://localhost:3000", "https://socio.warasdelivery.com"]
 
 
 
