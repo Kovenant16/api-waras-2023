@@ -1,42 +1,50 @@
 import mongoose from "mongoose";
 
-const subcategoriaSchema = new mongoose.Schema({
+const opcionUnicaSchema = new mongoose.Schema({
     nombre: String,
     descripcion: String,
-    precio: Number, // Mantenemos el tipo Number para precios con decimales
+    obligatorio:Boolean,
+    opciones: [
+        {
+            nombre: String,
+            precio: Number
+        }
+    ],
+    limiteSeleccion: { type: Number, default: 1 } // Límite de selección por defecto para opciones únicas
 });
+
+const opcionMultipleSchema = new mongoose.Schema({
+    nombre: String,
+    descripcion: String,
+    obligatorio:Boolean,
+    opciones: [
+        {
+            nombre: String,
+            precio: Number
+        }
+    ],
+    limiteSeleccion: { type: Number, default: 1 } // Límite de selección por defecto para opciones múltiples
+});
+
+
 
 const productoSchema = mongoose.Schema({
     local: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Local", // Referencia al modelo "Local"
+        ref: "Local",
     },
     nombre: String,
     categoria: String,
     descripcion: String,
-    subcategorias: [subcategoriaSchema], // Un arreglo de subcategorías
-    precio: Number, // Mantenemos el tipo Number para precios con decimales
+    precio:Number,
     cover: String,
     taper:Boolean,
-    preciosCompetencia: [
-        {
-            nombreCompetidor: String,
-            precioCompetencia: Number, // Mantenemos el tipo Number para precios con decimales
-            logoCompetidor: String,
-        },
-    ],
-    opciones:[
-        {
-            nombre:String,
-            precio:Number
-        }
-    ],
-    opcionesMultiples:[
-        {
-            nombre:String,
-            precio:Number
-        }
-    ]
+    opcionesUnicas: [opcionUnicaSchema],
+    opcionesMultiples: [opcionMultipleSchema],
+    disponibilidad: { type: Boolean, default: true },
+
+    
+
 });
 
 const Producto = mongoose.model("Producto", productoSchema);

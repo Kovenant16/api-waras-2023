@@ -81,7 +81,7 @@ const obtenerProductoPorId = async (req, res) => {
         // Envía la respuesta con el producto encontrado
         res.json(producto);
 
-        console.log("Producto encontrado:", producto);
+        
     } catch (error) {
         console.error("Error al obtener producto por ID:", error);
         res.status(500).json({ error: "Error interno del servidor" });
@@ -130,23 +130,23 @@ const obtenerProductosPorCategoria = async (req, res) => {
 };
 
 const agregarProducto = async (req, res) => {
-    const { localId, nombre, categoria,subcategorias, descripcion, precio,taper, preciosCompetencia, cover, opciones, tags, opcionesMultiples } = req.body;
-
-    const nuevoProducto = new Producto({
-        local: localId,
-        nombre,
-        categoria,
-        descripcion,
-        precio,
-        preciosCompetencia,
-        subcategorias,
-        taper,
-        cover,
-        opciones,
-        opcionesMultiples
-    });
-
     try {
+        const { localId, nombre, categoria, descripcion, precio, cover, taper, opcionesUnicas, opcionesMultiples, disponibilidad, tags } = req.body;
+
+        const nuevoProducto = new Producto({
+            local: localId,
+            nombre,
+            categoria,
+            descripcion,
+            precio,
+            cover,
+            taper,
+            opcionesUnicas,
+            opcionesMultiples,
+            disponibilidad,
+            tags
+        });
+
         const productoAlmacenado = await nuevoProducto.save();
         res.status(201).json(productoAlmacenado);
     } catch (error) {
@@ -154,6 +154,7 @@ const agregarProducto = async (req, res) => {
         res.status(500).json({ mensaje: 'Error en el servidor' });
     }
 }
+
 
 
 
@@ -198,12 +199,12 @@ const editarProducto = async (req, res) => {
         producto.nombre = req.body.nombre || producto.nombre;
         producto.categoria = req.body.categoria || producto.categoria;
         producto.descripcion = req.body.descripcion || producto.descripcion;
-        producto.subcategorias = req.body.subcategorias || producto.subcategorias;
         producto.precio = req.body.precio || producto.precio;
         producto.cover = req.body.cover || producto.cover;
         producto.taper = req.body.taper || producto.taper;
-        producto.preciosCompetencia = req.body.preciosCompetencia || producto.preciosCompetencia;
         producto.local = req.body.local || producto.local;
+        producto.opcionesUnicas = req.body.opcionesUnicas;
+        producto.opcionesMultiples = req.body.opcionesMultiples;
 
         const productoActualizado = await producto.save();
         res.json(productoActualizado);

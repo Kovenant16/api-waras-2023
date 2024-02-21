@@ -16,7 +16,7 @@ dotenv.config()
 conectarDB()
 
 //cors
-const whitelist = ['https://admin.warasdelivery.com','https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.24:5173", "http://localhost:3000", "https://socio.warasdelivery.com"]
+const whitelist = ['https://admin.warasdelivery.com', 'https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.24:5173", "http://localhost:3000", "https://socio.warasdelivery.com"]
 
 
 
@@ -46,16 +46,16 @@ app.use("/api/categoria", categoriaRoutes)
 
 const PORT = 4000 //process.env.PORT || 4000
 
-const servidor = app.listen(PORT,()=> {
+const servidor = app.listen(PORT, () => {
     console.log(`servidor corriendo en el puerto ${PORT}`);
 })
 
 //Sockets.io
-import {Server} from 'socket.io'
+import { Server } from 'socket.io'
 
 const io = new Server(servidor, {
-    pingTimeout:60000,
-    cors:{
-        origin: ['https://admin.warasdelivery.com','https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000","http://192.168.100.24:3000", "http://192.168.100.224:5173", "http://localhost:3000", "https://socio.warasdelivery.com"]
+    pingTimeout: 60000,
+    cors: {
+        origin: ['https://admin.warasdelivery.com', 'https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.24:3000", "http://192.168.100.224:5173", "http://localhost:3000", "https://socio.warasdelivery.com"]
     },
 });
