@@ -75,19 +75,15 @@ const obtenerPedidosMotorizadoLogueado = async (req, res) => {
 
 //completado
 const nuevoPedido = async (req, res) => {
+    const pedido = new Pedido(req.body);
+
+    pedido.generadoPor = req.usuario._id;
+
     try {
-        // Proceso de creación de un nuevo pedido...
-        const nuevoPedidoCreado = await Pedido.create(req.body);
-
-        // Emitir un evento para notificar al cliente sobre el nuevo pedido creado
-        io.emit('nuevoPedido', nuevoPedidoCreado);
-        console.log(nuevoPedidoCreado);
-
-        // Enviar una respuesta al cliente
-        res.status(201).json({ mensaje: 'Pedido creado exitosamente', pedido: nuevoPedidoCreado });
+        const proyectoAlmacenado = await pedido.save();
+        res.json(proyectoAlmacenado);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ mensaje: 'Error al crear el pedido' });
     }
 };
 
