@@ -44,6 +44,7 @@ const editarLocal = async (req, res) => {
     local.diasAbiertos = req.body.diasAbiertos || local.diasAbiertos;
     local.horaInicioFin = req.body.horaInicioFin || local.horaInicioFin;
     local.adicionalPorTaper = req.body.adicionalPorTaper || local.adicionalPorTaper;
+    local.tags = req.body.tags || local.tags;
 
     try {
         const localAlmacenado = await local.save();

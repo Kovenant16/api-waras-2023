@@ -2,6 +2,18 @@ import Pedido from "../models/Pedido.js";
 import Usuario from "../models/Usuario.js";
 import Local from "../models/Local.js";
 import Cliente from "../models/Cliente.js";
+import { Server } from 'socket.io';
+
+const io = new Server(/* Parámetros del servidor, como la instancia de tu servidor HTTP */);
+
+// Manejo de eventos de WebSocket
+io.on('connection', (socket) => {
+    console.log('Nuevo cliente conectado');
+
+    socket.on('disconnect', () => {
+        console.log('Cliente desconectado');
+    });
+});
 
 //testeo pendiente
 const obtenerUltimosVeintePedidos = async (req, res) => {
@@ -63,15 +75,19 @@ const obtenerPedidosMotorizadoLogueado = async (req, res) => {
 
 //completado
 const nuevoPedido = async (req, res) => {
-    const pedido = new Pedido(req.body);
-
-    pedido.generadoPor = req.usuario._id;
-
     try {
-        const proyectoAlmacenado = await pedido.save();
-        res.json(proyectoAlmacenado);
+        // Proceso de creación de un nuevo pedido...
+        const nuevoPedidoCreado = await Pedido.create(req.body);
+
+        // Emitir un evento para notificar al cliente sobre el nuevo pedido creado
+        io.emit('nuevoPedido', nuevoPedidoCreado);
+        console.log(nuevoPedidoCreado);
+
+        // Enviar una respuesta al cliente
+        res.status(201).json({ mensaje: 'Pedido creado exitosamente', pedido: nuevoPedidoCreado });
     } catch (error) {
         console.log(error);
+        res.status(500).json({ mensaje: 'Error al crear el pedido' });
     }
 };
 
@@ -300,6 +316,29 @@ const obtenerPedidosPorTelefono = async (req, res) => {
             .select("delivery direccion fecha local gps telefono")
             .sort({ fecha: -1 })
             .limit(20); // Ordena los pedidos por fecha en orden descendente
+        res.json(pedidos);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error al obtener los pedidos." });
+    }
+};
+
+const obtenerPedidosPorTelefonoYLocal = async (req, res) => {
+    try {
+        let { telefono, localId } = req.body;
+        telefono = telefono.replace(/\s+/g, '');
+
+        let filtro = { telefono };
+        if (localId) {
+            filtro.local = localId;
+        }
+
+        const pedidos = await Pedido.find(filtro)
+
+            .select("delivery direccion fecha  gps telefono")
+            .sort({ fecha: -1 })
+            .limit(15);
+
         res.json(pedidos);
     } catch (error) {
         console.error(error);
@@ -592,5 +631,6 @@ export {
     obtenerPedidosPorFechaYDriver,
     obtenerPedidosPorTelefonoConGps,
     obtenerPedidosSinGPS,
-    obtenerPedidosPorTelefono
+    obtenerPedidosPorTelefono,
+    obtenerPedidosPorTelefonoYLocal
 };

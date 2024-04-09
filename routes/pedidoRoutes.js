@@ -25,7 +25,8 @@ import {
     obtenerPedidosPorFechaYDriver,
     obtenerPedidosPorTelefonoConGps,
     obtenerPedidosSinGPS,
-    obtenerPedidosPorTelefono
+    obtenerPedidosPorTelefono,
+    obtenerPedidosPorTelefonoYLocal
 } from "../controllers/pedidoController.js";
 import checkAuth from "../middleware/checkAuth.js";
 
@@ -42,6 +43,7 @@ router.post('/obtenerPedidosPorFecha', checkAuth, obtenerPedidosPorFecha)
 router.post('/obtenerPedidosPorFechaYDriver', checkAuth, obtenerPedidosPorFechaYDriver)
 router.post('/obtenerPedidosPorFechasYLocal', checkAuth, obtenerPedidosPorFechasYLocal)
 router.post('/busquedaPorTelefono', checkAuth, obtenerPedidosPorTelefono)
+router.post('/busquedaPorTelefonoYLocal', checkAuth, obtenerPedidosPorTelefonoYLocal)
 router.post('/pedidosSocio', checkAuth, obtenerPedidosSocio)
 router.post('/pedidosMotorizado', obtenerPedidosMotorizado)
 router.get('/pedidoSocio/:id', checkAuth, obtenerPedidoSocio)

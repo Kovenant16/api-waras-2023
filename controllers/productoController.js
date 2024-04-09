@@ -214,6 +214,27 @@ const editarProducto = async (req, res) => {
     }
 };
 
+const toggleDisponibilidadProducto = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const producto = await Producto.findById(id);
+
+        if (!producto) {
+            return res.status(404).json({ msg: "Producto no encontrado" });
+        }
+
+        // Alternamos el valor de producto.disponible
+        producto.disponibilidad = !producto.disponibilidad;
+
+        const productoActualizado = await producto.save();
+        res.json(productoActualizado);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error al alternar la disponibilidad del producto" });
+    }
+};
+
 
 
 export {
@@ -225,5 +246,6 @@ export {
     eliminarProducto,
     editarProducto,
     obtenerProductosPorCategoria,
-    obtenerTiendasTotales
+    obtenerTiendasTotales,
+    toggleDisponibilidadProducto
 };

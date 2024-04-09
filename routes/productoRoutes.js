@@ -8,7 +8,8 @@ import {
     editarProducto,
     obtenerProductosPorCategoria,
     obtenerTiendasTotales,
-    obtenerProductoPorId
+    obtenerProductoPorId,
+    toggleDisponibilidadProducto
 } from '../controllers/productoController.js'
 import checkAuth from '../middleware/checkAuth.js';
 
@@ -23,5 +24,6 @@ router.put("/:id", editarProducto);
 router.delete("/:id", eliminarProducto)
 router.post("/obtenerProductosPorTienda", obtenerProductosPorTienda)
 router.post("/obtenerProductosPorCategoria", obtenerProductosPorCategoria)
+router.put("/toggleDisponibilidad/:id", toggleDisponibilidadProducto);
 
 export default router;

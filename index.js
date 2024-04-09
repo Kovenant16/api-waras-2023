@@ -53,9 +53,4 @@ const servidor = app.listen(PORT, () => {
 //Sockets.io
 import { Server } from 'socket.io'
 
-const io = new Server(servidor, {
-    pingTimeout: 60000,
-    cors: {
-        origin: ['https://admin.warasdelivery.com', 'https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.24:3000", "http://192.168.100.224:5173", "http://localhost:3000", "https://socio.warasdelivery.com"]
-    },
-});
+
