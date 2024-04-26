@@ -251,5 +251,5 @@ export {
     obtenerProductosPorCategoria,
     obtenerTiendasTotales,
     toggleDisponibilidadProducto,
-    obtenerGPSporIDs
+    
 };

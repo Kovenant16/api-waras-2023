@@ -1,6 +1,6 @@
 import express from "express";
 
-import { agregarLocal, editarLocal, toggleTiendaLocal, eliminarLocal, obtenerGPSporIDs } from "../controllers/localController.js";
+import { agregarLocal, editarLocal, toggleTiendaLocal, eliminarLocal } from "../controllers/localController.js";
 import checkAuth from "../middleware/checkAuth.js";
 
 const router = express.Router();
