@@ -26,7 +26,8 @@ import {
     obtenerPedidosPorTelefonoConGps,
     obtenerPedidosSinGPS,
     obtenerPedidosPorTelefono,
-    obtenerPedidosPorTelefonoYLocal
+    obtenerPedidosPorTelefonoYLocal,
+    actualizarCoordenadasPedido
 } from "../controllers/pedidoController.js";
 import checkAuth from "../middleware/checkAuth.js";
 
@@ -55,6 +56,7 @@ router.put("/liberarPedido/:id", checkAuth, liberarPedido)
 router.put("/marcarEnLocal/:id", checkAuth, marcarPedidoEnLocal)
 router.put("/marcarRecogido/:id", checkAuth, marcarPedidoRecogido)
 router.put("/marcarEntregado/:id", checkAuth, marcarPedidoEntregado)
+router.put("/editarGPS/:id", checkAuth, actualizarCoordenadasPedido )
 router
     .route("/:id")
     .get(checkAuth, obtenerPedido)

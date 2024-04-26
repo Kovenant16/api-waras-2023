@@ -9,7 +9,7 @@ import {
     obtenerProductosPorCategoria,
     obtenerTiendasTotales,
     obtenerProductoPorId,
-    toggleDisponibilidadProducto
+    toggleDisponibilidadProducto,
 } from '../controllers/productoController.js'
 import checkAuth from '../middleware/checkAuth.js';
 

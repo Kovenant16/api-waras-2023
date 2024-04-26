@@ -9,33 +9,19 @@ import clienteRoutes from "./routes/clienteRoutes.js";
 import productoRoutes from "./routes/productoRoutes.js"
 import categoriaRoutes from "./routes/categoriaRoutes.js"
 
-const app = express();
-app.use(express.json());
+import http from 'http'
+import pedidos from './sockets/pedidos.js';
+import { Server as WebsocketServer } from 'socket.io';
+
 
 dotenv.config()
 conectarDB()
 
-//cors
-const whitelist = ['https://admin.warasdelivery.com', 'https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.24:5173", "http://localhost:3000", "https://socio.warasdelivery.com"]
+const app = express()
 
 
-
-//Cors con acceso a un dominio
-
-const corsOptions = {
-    origin: function (origin, callback) {
-
-        if (whitelist.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Error de cors de aca"));
-        }
-    },
-};
-
+app.use(express.json());
 app.use(cors())
-
-
 
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/pedidos", pedidoRoutes);
@@ -46,11 +32,23 @@ app.use("/api/categoria", categoriaRoutes)
 
 const PORT = 4000 //process.env.PORT || 4000
 
-const servidor = app.listen(PORT, () => {
-    console.log(`servidor corriendo en el puerto ${PORT}`);
+const server = http.createServer(app)
+
+// Manejar errores de cors antes de iniciar el servidor de socket.io
+server.on('error', (error) => {
+    console.error('Error en el servidor:', error);
+    process.exit(1);
+});
+
+const httpServer = server.listen(PORT, () => {
+    console.log('Servidor corriendo en el puerto', PORT);
+});
+
+const io = new WebsocketServer(httpServer, {
+    pingTimeout: 60000,
+    cors: {
+        origin: '*'
+        // origin: ['https://admin.warasdelivery.com', 'https://moto.warasdelivery.com', "http://localhost:5173", "http://192.168.100.5:19000", "http://192.168.100.24:3000", "http://192.168.100.224:5173", "http://localhost:3000", "https://socio.warasdelivery.com", "https://192.168.1.49:8081"]
+    },
 })
-
-//Sockets.io
-import { Server } from 'socket.io'
-
-
+pedidos(io)

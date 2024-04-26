@@ -99,4 +99,7 @@ const eliminarLocal = async (req, res) => {
 }
 
 
+
+
+
 export {agregarLocal, editarLocal,toggleTiendaLocal, eliminarLocal}

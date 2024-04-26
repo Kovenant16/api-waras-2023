@@ -577,6 +577,30 @@ const marcarPedidoRecogido = async (req, res) => {
     }
 };
 
+const actualizarCoordenadasPedido = async (req, res) => {
+    const { id } = req.params;
+    const { coordenadas } = req.body; // Se espera que el cuerpo de la solicitud contenga las coordenadas en formato de cadena
+
+    try {
+        const pedido = await Pedido.findById(id);
+
+        if (!pedido) {
+            const error = new Error("Pedido no encontrado");
+            return res.status(404).json({ msg: error.message });
+        }
+
+        // Actualizar las coordenadas del pedido
+        pedido.gps = coordenadas;
+
+        const pedidoGuardado = await pedido.save();
+        res.json(pedidoGuardado);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
+
 const marcarPedidoEntregado = async (req, res) => {
     const { id } = req.params;
 
@@ -628,5 +652,6 @@ export {
     obtenerPedidosPorTelefonoConGps,
     obtenerPedidosSinGPS,
     obtenerPedidosPorTelefono,
-    obtenerPedidosPorTelefonoYLocal
+    obtenerPedidosPorTelefonoYLocal,
+    actualizarCoordenadasPedido
 };

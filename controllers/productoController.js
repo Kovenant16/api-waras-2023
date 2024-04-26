@@ -34,6 +34,8 @@ const obtenerTienda = async (req, res) => {
     }
 };
 
+
+
 const obtenerProductosPorTienda = async (req, res) => {
     const { idLocal } = req.body;
     console.log("ID de la tienda:", idLocal);
@@ -47,6 +49,7 @@ const obtenerProductosPorTienda = async (req, res) => {
 
         // Utiliza async/await para esperar la consulta a la base de datos
         const productos = await Producto.find({ local: idLocal })
+        .select('categoria cover descripcion nombre precio taper disponibilidad')
 
         if (!productos || productos.length === 0) {
             return res.status(404).json({ error: "No se encontraron productos para esta tienda" });
@@ -247,5 +250,6 @@ export {
     editarProducto,
     obtenerProductosPorCategoria,
     obtenerTiendasTotales,
-    toggleDisponibilidadProducto
+    toggleDisponibilidadProducto,
+    obtenerGPSporIDs
 };
